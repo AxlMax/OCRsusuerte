@@ -3,24 +3,28 @@ const textStructurer = require('./textStructurerClasses');
 
 /**
  * 
- * @param {String} ticketName nombre del ticket 
+ * @param {String}  base64Image nombre del ticket 
  * @param {String} typeTicket tipo de ticket
  * 
 */
 
-function textDetection(ticketName, typeTicket, res){
+function textDetection( base64Image, typeTicket, res){
 
     const client = new visionApi.ImageAnnotatorClient({
-        keyFilename:"./controller/ocr-susuerte-service-credentials.json"
+        keyFilename: process.env.CREDENTIAL_FILE
     });
 
-    client.textDetection(ticketName)
+    const imageBuffer = Buffer.from(base64Image, 'base64');
+
+    client.textDetection(imageBuffer)
     .then(
         textObject => {            
             const fullText = textObject[0].fullTextAnnotation.text.split('\n')
 
-            console.log(textObject)
-            console.log(fullText)
+            if(process.env.LOG === 'true'){
+                console.log(textObject)
+                console.log(fullText)
+            }
 
             var completeStructuredText = {}
             
@@ -40,7 +44,8 @@ function textDetection(ticketName, typeTicket, res){
             res.send(completeStructuredText)
         }   
     ).catch(
-        err      => console.log(err)
+        //err => res.status(400).send("error en servidor")
+        err => console.log(err)
     )
 }
 
