@@ -1,5 +1,8 @@
 const visionApi  = require('@google-cloud/vision');
 const textStructurer = require('./textStructurerClasses');
+const colors = require('colors');
+
+colors.enable()
 
 /**
  * 
@@ -41,11 +44,15 @@ function textDetection( base64Image, typeTicket, res){
                 }
             })
 
+            if(process.env.LOG === 'true') console.log(colors.green('[OK] response send'))
+
             res.send(completeStructuredText)
         }   
     ).catch(
-        //err => res.status(400).send("error en servidor")
-        err => console.log(err)
+        err => {
+            res.status(400).send("error en servidor")
+            console.log(colors.red(`[ERROR] ${err}`))
+        }
     )
 }
 
